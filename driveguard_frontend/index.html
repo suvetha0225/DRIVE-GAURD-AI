@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DriveGuard AI - Safety Dashboard</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #05090d;
+            color: #e8f0f7;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background: #070b10;
+            border-right: 1px solid #1b2732;
+            padding: 30px 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 65px;
+            padding-left: 10px;
+        }
+
+        .brand-logo {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: #45d69b;
+            color: #062015;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand-subtitle {
+            color: #72879a;
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-top: 8px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-item {
+            height: 58px;
+            border: none;
+            background: transparent;
+            color: #788b9d;
+            border-radius: 12px;
+            text-align: left;
+            padding: 0 20px;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #111c26;
+            color: #ffffff;
+            border-left: 2px solid #48e0a0;
+        }
+
+        .nav-icon {
+            margin-right: 15px;
+        }
+
+        .system-card {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            bottom: 25px;
+
+            padding: 18px;
+
+            background: #0c141d;
+            border: 1px solid #1b2b38;
+            border-radius: 14px;
+        }
+
+        .system-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #49e0a0;
+            margin-right: 8px;
+            box-shadow: 0 0 10px #49e0a0;
+        }
+
+        .system-title {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .system-text {
+            color: #708396;
+            font-size: 11px;
+            margin-top: 7px;
+            margin-left: 18px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 34px 42px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+        }
+
+        .eyebrow {
+            color: #718ba2;
+            letter-spacing: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 36px;
+            letter-spacing: -1px;
+        }
+
+        .backend-status {
+            color: #8da0b1;
+            font-size: 14px;
+        }
+
+        .online-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            background: #48e0a0;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 10px #48e0a0;
+        }
+
+        .offline-dot {
+            background: #ff5d6c;
+            box-shadow: 0 0 10px #ff5d6c;
+        }
+
+        /* ================= TOP GRID ================= */
+
+        .top-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(320px, 0.8fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: linear-gradient(
+                145deg,
+                #0c151e,
+                #081018
+            );
+
+            border: 1px solid #1d2c39;
+            border-radius: 17px;
+            padding: 22px;
+        }
+
+        .card-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-label {
+            color: #70879d;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 7px;
+        }
+
+        .live {
+            border: 1px solid #334554;
+            border-radius: 20px;
+            padding: 7px 13px;
+            color: #a8b7c4;
+            font-size: 11px;
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: #ff5d6c;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* ================= CAMERA ================= */
+
+        .camera-container {
+            height: 410px;
+            border: 1px solid #243441;
+            border-radius: 14px;
+            background: #04090e;
+            position: relative;
+            overflow: hidden;
+
+            /* subtle grid */
+            background-image:
+                linear-gradient(#0d171f 1px, transparent 1px),
+                linear-gradient(90deg, #0d171f 1px, transparent 1px);
+            background-size: 34px 34px;
+        }
+
+        .camera-feed {
+            position: absolute;
+            left: 0;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+            background: #04090e;
+
+            z-index: 2;
+        }
+
+        .camera-top-left {
+            position: absolute;
+            left: 18px;
+            top: 15px;
+            z-index: 5;
+
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #758a9e;
+        }
+
+        .green {
+            color: #4ae0a0;
+            font-weight: bold;
+        }
+
+        .camera-top-right {
+            position: absolute;
+            right: 18px;
+            top: 15px;
+            z-index: 5;
+
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #758a9e;
+        }
+
+        .camera-bottom {
+            position: absolute;
+            left: 18px;
+            bottom: 14px;
+            z-index: 5;
+
+            color: #60768b;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        .camera-loading {
+            position: absolute;
+            inset: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #72869a;
+            font-size: 14px;
+
+            z-index: 1;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status-card {
+            min-height: 493px;
+        }
+
+        .status-icon {
+            width: 42px;
+            height: 42px;
+            background: #063c2b;
+            color: #4ae0a0;
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+        }
+
+        .state {
+            text-align: center;
+            margin-top: 42px;
+        }
+
+        .state-name {
+            color: #49e0a0;
+            letter-spacing: 5px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .probability {
+            font-size: 58px;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+
+        .probability span {
+            font-size: 28px;
+            color: #718597;
+        }
+
+        .probability-label {
+            color: #72869a;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .progress {
+            height: 7px;
+            background: #1c2933;
+            border-radius: 10px;
+            margin-top: 40px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 12%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                #45e0a0,
+                #f3c64d
+            );
+            border-radius: 10px;
+        }
+
+        .status-list {
+            margin-top: 22px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 13px 0;
+            border-top: 1px solid #20303b;
+            color: #7d92a4;
+            font-size: 12px;
+        }
+
+        .status-value {
+            color: #e2ebf2;
+            font-weight: bold;
+        }
+
+        /* ================= STATS ================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            min-height: 135px;
+        }
+
+        .stat-label {
+            color: #72879b;
+            letter-spacing: 2px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 22px;
+        }
+
+        .stat-description {
+            color: #63788a;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .online {
+            color: #4ae0a0;
+        }
+
+        .offline {
+            color: #ff6471;
+        }
+
+        /* ================= LOWER SECTION ================= */
+
+        .lower-grid {
+            display: grid;
+            grid-template-columns: 2fr 0.8fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-area {
+            height: 200px;
+            position: relative;
+
+            background-image:
+                linear-gradient(#0d171f 1px, transparent 1px),
+                linear-gradient(90deg, #0d171f 1px, transparent 1px);
+
+            background-size: 45px 45px;
+
+            border-radius: 10px;
+        }
+
+        .chart-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 55px;
+            height: 2px;
+
+            background: #48e0a0;
+
+            transform: rotate(-2deg);
+            box-shadow: 0 0 8px rgba(72, 224, 160, 0.5);
+        }
+
+        .event {
+            padding: 14px 0;
+            border-bottom: 1px solid #1e2c36;
+            font-size: 12px;
+        }
+
+        .event-time {
+            color: #617689;
+            font-size: 10px;
+        }
+
+        .event-text {
+            margin-top: 5px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1100px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+                padding: 25px;
+            }
+
+            .top-grid,
+            .lower-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                DG
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    DriveGuard
+                </div>
+
+                <div class="brand-subtitle">
+                    AI SAFETY SYSTEM
+                </div>
+            </div>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <button class="nav-item active">
+                <span class="nav-icon">◈</span>
+                Dashboard
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">◉</span>
+                Analytics
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">△</span>
+                Alerts
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">⚙</span>
+                Settings
+            </button>
+
+        </nav>
+
+
+        <div class="system-card">
+
+            <div class="system-title">
+                <span class="system-dot"></span>
+                AI Engine Online
+            </div>
+
+            <div class="system-text">
+                Local processing active
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <div class="eyebrow">
+                    DRIVER MONITORING
+                </div>
+
+                <h1>
+                    Safety Dashboard
+                </h1>
+
+            </div>
+
+            <div class="backend-status" id="backendStatus">
+                <span class="online-dot"></span>
+                Backend Connecting...
+            </div>
+
+        </header>
+
+
+        <!-- ================= TOP ================= -->
+
+        <section class="top-grid">
+
+
+            <!-- CAMERA CARD -->
+
+            <div class="card">
+
+                <div class="card-title-row">
+
+                    <div>
+
+                        <div class="card-label">
+                            LIVE CAMERA
+                        </div>
+
+                        <div class="card-title">
+                            Driver Monitor
+                        </div>
+
+                    </div>
+
+                    <div class="live">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </div>
+
+                </div>
+
+
+                <!-- CAMERA -->
+
+                <div class="camera-container">
+
+                    <div class="camera-top-left">
+                        AI VISION
+                        <span class="green">ON</span>
+                    </div>
+
+                    <div class="camera-top-right">
+                        FACE TRACKING
+                        <span class="green">READY</span>
+                    </div>
+
+
+                    <!-- THIS IS YOUR LIVE PYTHON CAMERA -->
+
+                    <img
+                        id="cameraFeed"
+                        class="camera-feed"
+                        src="http://127.0.0.1:8000/video"
+                        alt="Live driver camera"
+                    >
+
+
+                    <div
+                        id="cameraLoading"
+                        class="camera-loading"
+                    >
+                        Connecting to camera...
+                    </div>
+
+
+                    <div class="camera-bottom">
+                        LOCAL PROCESSING
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS CARD -->
+
+            <div class="card status-card">
+
+                <div class="card-title-row">
+
+                    <div>
+
+                        <div class="card-label">
+                            CURRENT STATE
+                        </div>
+
+                        <div class="card-title">
+                            Driver Status
+                        </div>
+
+                    </div>
+
+                    <div class="status-icon">
+                        ✓
+                    </div>
+
+                </div>
+
+
+                <div class="state">
+
+                    <div
+                        id="driverState"
+                        class="state-name"
+                    >
+                        NORMAL
+                    </div>
+
+
+                    <div class="probability">
+
+                        <span id="probability">
+                            0
+                        </span>%
+
+                    </div>
+
+
+                    <div class="probability-label">
+                        Drowsiness probability
+                    </div>
+
+                </div>
+
+
+                <div class="progress">
+
+                    <div
+                        id="progressBar"
+                        class="progress-bar"
+                    ></div>
+
+                </div>
+
+
+                <div class="status-list">
+
+                    <div class="status-row">
+
+                        <span>
+                            Eye status
+                        </span>
+
+                        <span
+                            id="eyeStatus"
+                            class="status-value"
+                        >
+                            UNKNOWN
+                        </span>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Yawning
+                        </span>
+
+                        <span
+                            id="yawnStatus"
+                            class="status-value"
+                        >
+                            UNKNOWN
+                        </span>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            AI confidence
+                        </span>
+
+                        <span
+                            id="confidence"
+                            class="status-value"
+                        >
+                            0%
+                        </span>
+
+                    </div>
+
+
+                    <div class="status-row">
+
+                        <span>
+                            Face detected
+                        </span>
+
+                        <span
+                            id="faceStatus"
+                            class="status-value"
+                        >
+                            NO
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= STATS ================= -->
+
+        <section class="stats">
+
+
+            <div class="card stat-card">
+
+                <div class="stat-label">
+                    DRIVE TIME
+                </div>
+
+                <div
+                    id="driveTime"
+                    class="stat-value"
+                >
+                    00:00:00
+                </div>
+
+                <div class="stat-description">
+                    Current session
+                </div>
+
+            </div>
+
+
+            <div class="card stat-card">
+
+                <div class="stat-label">
+                    ALERTS
+                </div>
+
+                <div
+                    id="alertCount"
+                    class="stat-value"
+                >
+                    0
+                </div>
+
+                <div class="stat-description">
+                    This session
+                </div>
+
+            </div>
+
+
+            <div class="card stat-card">
+
+                <div class="stat-label">
+                    PEAK DROWSINESS
+                </div>
+
+                <div
+                    id="peakDrowsiness"
+                    class="stat-value"
+                >
+                    0%
+                </div>
+
+                <div class="stat-description">
+                    Highest recorded
+                </div>
+
+            </div>
+
+
+            <div class="card stat-card">
+
+                <div class="stat-label">
+                    AI STATUS
+                </div>
+
+                <div
+                    id="aiStatus"
+                    class="stat-value online"
+                >
+                    ONLINE
+                </div>
+
+                <div class="stat-description">
+                    Local inference
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= LOWER ================= -->
+
+        <section class="lower-grid">
+
+
+            <div class="card">
+
+                <div class="card-title-row">
+
+                    <div>
+
+                        <div class="card-label">
+                            REAL-TIME TREND
+                        </div>
+
+                        <div class="card-title">
+                            Drowsiness Level
+                        </div>
+
+                    </div>
+
+                    <strong
+                        id="trendValue"
+                        class="online"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="chart-area">
+
+                    <div class="chart-line"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title-row">
+
+                    <div>
+
+                        <div class="card-label">
+                            EVENT LOG
+                        </div>
+
+                        <div class="card-title">
+                            Recent Events
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div id="eventLog">
+
+                    <div class="event">
+
+                        <div class="event-time">
+                            NOW
+                        </div>
+
+                        <div class="event-text">
+                            Monitoring started
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+const BACKEND = "http://127.0.0.1:8000";
+
+const cameraFeed =
+    document.getElementById("cameraFeed");
+
+const cameraLoading =
+    document.getElementById("cameraLoading");
+
+const backendStatus =
+    document.getElementById("backendStatus");
+
+
+/* =========================================
+   CAMERA
+========================================= */
+
+cameraFeed.onload = function () {
+
+    cameraLoading.style.display = "none";
+
+};
+
+cameraFeed.onerror = function () {
+
+    cameraLoading.style.display = "flex";
+
+    cameraLoading.textContent =
+        "Camera unavailable";
+
+};
+
+
+/* =========================================
+   BACKEND STATUS
+========================================= */
+
+async function checkBackend() {
+
+    try {
+
+        const response =
+            await fetch(
+                BACKEND + "/api/status"
+            );
+
+        if (!response.ok) {
+            throw new Error();
+        }
+
+        backendStatus.innerHTML =
+            '<span class="online-dot"></span> Backend Online';
+
+    }
+
+    catch (error) {
+
+        backendStatus.innerHTML =
+            '<span class="online-dot offline-dot"></span> Backend Offline';
+
+    }
+
+}
+
+
+/* =========================================
+   DRIVER STATUS
+========================================= */
+
+async function updateDashboard() {
+
+    try {
+
+        const response =
+            await fetch(
+                BACKEND + "/api/status"
+            );
+
+        if (!response.ok) {
+            throw new Error();
+        }
+
+        const data =
+            await response.json();
+
+
+        /* Prediction */
+
+        let probability =
+            Number(data.confidence || 0);
+
+
+        if (probability <= 1) {
+            probability *= 100;
+        }
+
+
+        probability =
+            Math.round(probability);
+
+
+        document.getElementById(
+            "probability"
+        ).textContent = probability;
+
+
+        document.getElementById(
+            "progressBar"
+        ).style.width =
+            Math.min(probability, 100) + "%";
+
+
+        document.getElementById(
+            "trendValue"
+        ).textContent =
+            probability + "%";
+
+
+        /* Eye */
+
+        document.getElementById(
+            "eyeStatus"
+        ).textContent =
+            data.eye_status || "UNKNOWN";
+
+
+        /* Yawning */
+
+        document.getElementById(
+            "yawnStatus"
+        ).textContent =
+            data.yawn_status || "UNKNOWN";
+
+
+        /* Driver status */
+
+        let prediction =
+            data.prediction || "Unknown";
+
+
+        if (
+            prediction.toLowerCase().includes("closed") ||
+            prediction.toLowerCase().includes("yawn") ||
+            prediction.toLowerCase().includes("drows")
+        ) {
+
+            document.getElementById(
+                "driverState"
+            ).textContent = "ALERT";
+
+        }
+
+        else {
+
+            document.getElementById(
+                "driverState"
+            ).textContent = "NORMAL";
+
+        }
+
+
+        /* Face */
+
+        document.getElementById(
+            "faceStatus"
+        ).textContent =
+            data.face_detected
+                ? "YES"
+                : "NO";
+
+
+        /* Confidence */
+
+        document.getElementById(
+            "confidence"
+        ).textContent =
+            probability + "%";
+
+
+        /* AI */
+
+        document.getElementById(
+            "aiStatus"
+        ).textContent = "ONLINE";
+
+
+        backendStatus.innerHTML =
+            '<span class="online-dot"></span> Backend Online';
+
+    }
+
+    catch (error) {
+
+        backendStatus.innerHTML =
+            '<span class="online-dot offline-dot"></span> Backend Offline';
+
+        document.getElementById(
+            "aiStatus"
+        ).textContent = "OFFLINE";
+
+    }
+
+}
+
+
+/* =========================================
+   DRIVE TIMER
+========================================= */
+
+const startTime = Date.now();
+
+function updateDriveTime() {
+
+    const elapsed =
+        Math.floor(
+            (Date.now() - startTime) / 1000
+        );
+
+    const hours =
+        Math.floor(elapsed / 3600);
+
+    const minutes =
+        Math.floor(
+            (elapsed % 3600) / 60
+        );
+
+    const seconds =
+        elapsed % 60;
+
+
+    const formatted =
+        String(hours).padStart(2, "0") +
+        ":" +
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
+
+
+    document.getElementById(
+        "driveTime"
+    ).textContent = formatted;
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+checkBackend();
+
+updateDashboard();
+
+setInterval(
+    updateDashboard,
+    1000
+);
+
+setInterval(
+    updateDriveTime,
+    1000
+);
+
+</script>
+
+</body>
+</html>
